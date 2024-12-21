@@ -6,7 +6,7 @@ codes for NILC/cILC on deprojected simulations. We aim to implement component se
 
 - `AliCPT_lens_fgcleaned-beamsys.py` uses NILC and cILC methods to implement foreground cleaning on AliCPT simulations with beam systematics. This is our main pipeline.
 - `likelihood_only_r.py` samples the posterior distribution of $r$ from cleaned BB power spectrum.
-- `synfast_noise.py` produces noise simulations.
+- `synfast_noise.py` produces input noise simulations.
 - `read_deproj_params.ipynb` checks if the recovered deprojection coefficients fit well with the input ones.
 
 #### Plot folder
