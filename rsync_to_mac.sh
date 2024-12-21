@@ -1,11 +1,7 @@
 #!/bin/bash
 
 
-des="djz@192.168.4.249:~/Downloads/beamsys/"
-src="/home/doujzh/Documents/AliCPT_beamsys/output/"
+des="djz@192.168.4.81:~/Downloads/plots_paper/"
+src="/home/doujzh/Documents/djzfiles/plots_paper/"
 
-rsync -azvrP --progress --copy-links --rsh="/usr/bin/sshpass -p 690109 ssh -o StrictHostKeyChecking=no -l djz" $src  $des
-des="djz@192.168.4.249:~/Downloads/beamsys/"
-src="/media/doujzh/AliCPT_data2/Zirui_beamsys/Mask"
-
-rsync -azvrP --progress --copy-links --exclude *.fits --rsh="/usr/bin/sshpass -p 690109 ssh -o StrictHostKeyChecking=no -l djz" $src  $des
+rsync -azvrP --progress --exclude *.fits --copy-links --rsh="/usr/bin/sshpass -p 690109 ssh -o StrictHostKeyChecking=no -l djz" $src  $des

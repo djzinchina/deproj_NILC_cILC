@@ -14,7 +14,7 @@ import scipy
 nside = 1024
 lmax = 1500
 lmax_o = 1000
-nsims = 100
+nsims = 300
 start_sim = 0
 
 nwalkers = 48
@@ -25,28 +25,34 @@ bin_size = 30
 bin_i = 1
 bin_f = 5
 
-output_root = '/home/doujzh/Documents/AliCPT_beamsys/output/'
-resources_root = '/media/doujzh/AliCPT_data/AliCPT_lens2/data/'
+output_root = '/home/doujzh/Documents/djzfiles/plots_paper/'
+data_root = '/media/doujzh/AliCPT_data/AliCPT_lens2/data/no_fix_bin/'
+
+def read_rdata(case_aff):
+    rdata = np.load('/media/doujzh/Ancillary_data/cNILC_covariance_matrix/output/data/cNILC_r-MC_samples_'+case_aff+'.npz')["cNILC_r"]
+    # return np.reshape(rdata, (len(rdata),1))
+    return rdata
+
+data_wobs = read_rdata("UNPinvNvar_cilc_lens_null_1-5")
+# print(data_wobs.shape)
+
+r_1sigma = np.percentile(data_wobs, [16, 50, 84])
+r_2sigma = np.percentile(data_wobs, [5, 95])
+
+print("1 and 2 sigma: ", np.percentile(data_wobs, [68,95]))
+theta_MMSE = np.mean(data_wobs)
+print("r = ", theta_MMSE, '-', theta_MMSE - r_1sigma[0], '+', r_1sigma[2] - theta_MMSE)
 
 msk_aff = 'UNPinvNvar'
-cases = ['_lens_deproj']
+cases = ['_deproj']
 for case in cases:
-    method = ['_cnilc', '_cilc'][1]
-    case_aff = msk_aff + method + case
+    case_aff = msk_aff + case
     print("case :", case_aff)
     r = 0.0
 
-
-    # msk_cut_aff = 'UNPinvNvar_newN0'
-
-    plt.style.use('seaborn-ticks')
-    plt.rc('font', family='sans-serif', size=12)
-    plt.rcParams['font.sans-serif'] = 'Helvetica'
-    my_dpi = 600
-
     def import_PSM_spec(r=0.023,file_type='unlensed'):
         # hdul = fits.open('/home/doujzh/DATA/PSM_output/components/cmb/cmb_unlensed_cl.fits')
-        hdul = fits.open('/media/doujzh/AliCPT_data2/data_challenge2/cl/cmb_'+file_type+'_cl.fits')
+        hdul = fits.open('/media/doujzh/AliCPT_data/data_challenge2/cl/cmb_'+file_type+'_cl.fits')
         # cols = hdul[1].columns
         # cols.info()
         data = hdul[1].data
@@ -77,7 +83,7 @@ for case in cases:
     Dl_act_mean= []
     Cl_nodb = []
     for sim in tqdm(range(start_sim, nsims), ncols=120):
-        Dl_arr = np.loadtxt(resources_root+'Dl_tot_sim'+str(sim).zfill(3)+'.dat')
+        Dl_arr = np.loadtxt(data_root+'Dl_tot_sim'+str(sim).zfill(3)+'.dat')
 #       leff, Dl_TT[0], Dl_EE[0], Dl_BB[0], Dl_TE[0], \
 #       resDl_TT[0], resDl_EE[0], resDl_BB[0], resDl_TE[0], \
 #       resNl_TT[0], resNl_EE[0], resNl_BB[0], \
@@ -102,9 +108,8 @@ for case in cases:
                 Mfid[b1,b2] = Mfid[b2, b1] = np.cov(Cl_nodb[:,b1], Cl_nodb[:,b2])[0,1]
     Mfid = Mfid[bin_i:bin_f+1, bin_i:bin_f+1]
     # print(input_data.shape)
-    Dl_hat = Dl_act_mean
 
-    Cl_hat = (Dl_hat / Dell_factor)[bin_i:bin_f+1]
+    Cl_hat = (Dl_act_mean / Dell_factor)[bin_i:bin_f+1]
 
     Msize = len(Cl_hat)
 
@@ -211,7 +216,7 @@ for case in cases:
 
     flat_GLsamples = GLsampler.get_chain(discard=100, thin=10, flat=True)
     # print("Shape", flat_GLsamples.shape)
-    # np.savez(output_root+'data/r-MC_samples_'+case_aff+'.npz', cNILC_r=flat_GLsamples[:,0])
+    np.savez(output_root+'r-MC_samples_'+case_aff+'.npz', r=flat_GLsamples[:,0])
     theta_MAP = flat_GLsamples[np.argmax(GLsampler.get_log_prob(flat=True,discard=300, thin=10))]
     theta_MMSE = np.mean(flat_GLsamples, axis=0)
     # theta_MAP = np.median(flat_GLsamples, axis=0)
@@ -224,13 +229,13 @@ for case in cases:
 
     print("1 and 2 sigma: ", np.percentile(flat_GLsamples[:,0], [68,95]))
     print("r = ", theta_MMSE[0], '-', theta_MMSE[0] - r_1sigma[0], '+', r_1sigma[2] - theta_MMSE[0])
-    if r>0:
-        np.savetxt(output_root+'r-only_likelihood_cNILC_'+case_aff+'.dat', [theta_MMSE[0], theta_MMSE[0] - r_1sigma[0], r_1sigma[2] - theta_MMSE[0],
-        theta_MMSE[0] - r_2sigma[0], r_2sigma[1] - theta_MMSE[0]])
-        # 1-sigma-CI(mean, minus, plus), 2-sigma-CI(minu, plus)
-    else:
-        np.savetxt(output_root+'r-only_likelihood_cNILC_'+case_aff+'.dat', [theta_MMSE[0], np.percentile(flat_GLsamples[:,0], [95])])
-        # mean, 95%-up-limit  
+    # if r>0:
+    #     np.savetxt(output_root+'r-only_likelihood_'+case_aff+'.dat', [theta_MMSE[0], theta_MMSE[0] - r_1sigma[0], r_1sigma[2] - theta_MMSE[0],
+    #     theta_MMSE[0] - r_2sigma[0], r_2sigma[1] - theta_MMSE[0]])
+    #     # 1-sigma-CI(mean, minus, plus), 2-sigma-CI(minu, plus)
+    # else:
+    #     np.savetxt(output_root+'r-only_likelihood_'+case_aff+'.dat', [theta_MMSE[0], np.percentile(flat_GLsamples[:,0], [95])])
+    #     # mean, 95%-up-limit  
 
     truth1d = [
                 [r], 
@@ -248,15 +253,18 @@ for case in cases:
 
 
     fig, ax = plt.subplots(figsize=(2.5, 2.5), dpi=600)
-    plt.style.use('seaborn-ticks')
+    plt.style.use('seaborn-v0_8-ticks')
     plt.rc('font', family='sans-serif', size=6)
     plt.rcParams['font.sans-serif'] = 'Helvetica'
-    plot_hist(flat_GLsamples[:,0], ax, 'cILC', 'C0')
-    ax.axvline(x=np.percentile(flat_GLsamples[:,0], [95]), c='k', lw='0.7', ls='--', label='95% CL.')
+    plot_hist(flat_GLsamples[:,0], ax, 'w/ BS.', 'C0')
+    plot_hist(data_wobs, ax, 'w/o BS.', 'C1')
+    ax.axvline(x=np.percentile(flat_GLsamples[:,0], [95]), c='k', lw='0.7', ls='--', label='w/ BS. 95%')
+    ax.axvline(x=np.percentile(data_wobs, [95]), c='k', lw='0.7', ls='dotted', label='w/o BS. 95%')
     ax.set_xlabel(r'$r$', fontsize=7)
     ax.set_ylabel(r'$P/P_{\rm max}$', fontsize=7)
     labels = ax.legend(loc='best', frameon=False, fontsize=6.5, ncol=1).get_texts()
     labels[0].set_color("C0")
+    labels[1].set_color("C1")
     ax.set_xlim(xmin=0, xmax=0.1)
     ax.set_ylim(ymin=0, ymax=1)
     plt.savefig(output_root+'r-only_likelihood_'+case_aff+'.png',bbox_inches='tight')

@@ -157,7 +157,7 @@ for sim in tqdm(range(start_sim, start_sim + nsims), ncols=120):
     # ax.legend(loc='best', frameon=False, fontsize=12)
     # plt.savefig(output_root+'/test_beam.png',bbox_inches='tight',pad_inches=0.1)
     # exit()
-    # cmb = fetch_cmb(sim)
+    cmb = fetch_cmb(sim)
     # cl_cmb = hp.anafast(cmb, nspec=4, lmax=lmax, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts')# / fsky
     # fno, fig, ax = cf.make_plotaxes()
     # ax.plot(ells[40:lmax_o+1], Dell_factor[40:lmax_o+1]*cl_cmb[0, 40:lmax_o+1], '-', label='TT anafast')
@@ -188,206 +188,206 @@ for sim in tqdm(range(start_sim, start_sim + nsims), ncols=120):
     # ax.legend(loc='best', frameon=False, fontsize=12)
     # plt.savefig(output_root+'/test_TE.png',bbox_inches='tight',pad_inches=0.1)
     # exit()
-    # cmb_sim = hp.smoothing(cmb, fwhm=np.deg2rad(map_fwhm / 60.), use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts')
-    # cmbpfg_sim = fetch_cmbpfg(sim, deproj=True)
-    # noise_sim = fetch_noise(sim)
-    # map_sim = np.array(cmbpfg_sim) + np.array(noise_sim)
-    # dr_sim = np.array(cmbpfg_sim) - np.array(smooth_cmb(cmb)) - fg
+    cmb_sim = hp.smoothing(cmb, fwhm=np.deg2rad(map_fwhm / 60.), use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts')
+    cmbpfg_sim = fetch_cmbpfg(sim, deproj=True)
+    noise_sim = fetch_noise(sim)
+    map_sim = np.array(cmbpfg_sim) + np.array(noise_sim)
+    dr_sim = np.array(cmbpfg_sim) - np.array(smooth_cmb(cmb)) - fg
     # print(dr_sim.shape, fg.shape)
     # if sim == 0: cf.plot_maps(dr_sim[2][2], mask_in=mask_alicpt, proj='orth',  outfile=output_root+'/Zero_100GHz_sim'+str(sim)+'.png', show=False)
     # exit()
-    # Blm_wgt = []
-    # Blm_sim = []
-    # Blmapo_sim = []
-    # Nlm_sim = []
-    # for nu in map_sel:
-        # cf.plot_maps(map_sim[-1][0], vmin=-450., vmax=450., proj='orth', outfile=output_root+'/maps/input_nu'+str(nu)+'_sim'+str(sim)+'.png', show=False)
+    Blm_wgt = []
+    Blm_sim = []
+    Blmapo_sim = []
+    Nlm_sim = []
+    for nu in map_sel:
+        cf.plot_maps(map_sim[-1][0], vmin=-450., vmax=450., proj='orth', outfile=output_root+'/maps/input_nu'+str(nu)+'_sim'+str(sim)+'.png', show=False)
 
-        # Bmap_nu = cf.get_cleanedBmap(map_sim[nu], mask_UNP, lmax_sht=lmax)
+        Bmap_nu = cf.get_cleanedBmap(map_sim[nu], mask_UNP, lmax_sht=lmax)
 
-        # if nu == 4: Bmap_act = cf.get_cleanedBmap(cmb_sim[4], mask_UNP, lmax_sht=lmax)
-        # Blm_wgt.append(hp.map2alm(Bmap_nu * mask_apo, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts'))
-        # Blm_sim.append(hp.map2alm(Bmap_nu * mask_UNP, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts'))
-        # Blmapo_sim.append(hp.map2alm(Bmap_nu * mask_apo, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts'))
+        if nu == 4: Bmap_act = cf.get_cleanedBmap(cmb_sim[4], mask_UNP, lmax_sht=lmax)
+        Blm_wgt.append(hp.map2alm(Bmap_nu * mask_apo, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts'))
+        Blm_sim.append(hp.map2alm(Bmap_nu * mask_UNP, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts'))
+        Blmapo_sim.append(hp.map2alm(Bmap_nu * mask_apo, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts'))
 
-        # Nmap_nu = cf.get_cleanedBmap(noise_sim[nu], mask_UNP, lmax_sht=lmax) 
-        # Nlm_sim.append(hp.map2alm(Nmap_nu * mask_UNP, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts'))
-        # del Bmap_nu , Nmap_nu
-    # Bmap_act = cf.get_cleanedBmap(cmb_sim, mask_UNP, lmax_sht=lmax)
-
-
-    # Blm_sim = np.array(Blm_sim)
-    # Blmapo_sim = np.array(Blmapo_sim)
-    # Nlm_sim = np.array(Nlm_sim)
-
-    # Blm_dr_sim = np.zeros_like(Blmapo_sim)
-    # for nu in [1, 4]:
-    #     Bdr_nu = cf.get_cleanedBmap(dr_sim[nu], mask_UNP, lmax_sht=lmax)
-    #     Blm_dr_sim[nu] = hp.map2alm(Bdr_nu * mask_UNP, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts')
+        Nmap_nu = cf.get_cleanedBmap(noise_sim[nu], mask_UNP, lmax_sht=lmax) 
+        Nlm_sim.append(hp.map2alm(Nmap_nu * mask_UNP, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts'))
+        del Bmap_nu , Nmap_nu
+    Bmap_act = cf.get_cleanedBmap(cmb_sim, mask_UNP, lmax_sht=lmax)
 
 
-    # wavelet_Tmaps = []
-    # wavelet_Emaps = []
-    # for nu in tqdm(range(nu_dim), ncols=120):
-    #     TEmap = cf.iqu2teb(map_sim[nu], mask_in=mask_30, teb='te', lmax_sht=lmax, return_alm=False) #*ps_msk
+    Blm_sim = np.array(Blm_sim)
+    Blmapo_sim = np.array(Blmapo_sim)
+    Nlm_sim = np.array(Nlm_sim)
 
-    #     # if nu == 4: TEmap_act = cf.iqu2teb(cmb_sim[4], mask_in=mask_30, teb='te', lmax_sht=lmax, return_alm=False)
+    Blm_dr_sim = np.zeros_like(Blmapo_sim)
+    for nu in [1, 4]:
+        Bdr_nu = cf.get_cleanedBmap(dr_sim[nu], mask_UNP, lmax_sht=lmax)
+        Blm_dr_sim[nu] = hp.map2alm(Bdr_nu * mask_UNP, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts')
 
-    #     Tlms = hp.map2alm(TEmap[0]*mask_30, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts')
-    #     beam_adjd_Tlm = hp.almxfl(Tlms, Tbeam_ratios[nu])
 
-    # # =============================================================
-    #     Elms = hp.map2alm(TEmap[1]*mask_30, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts')
-    #     beam_adjd_Elm = hp.almxfl(Elms, Ebeam_ratios[nu])
+    wavelet_Tmaps = []
+    wavelet_Emaps = []
+    for nu in tqdm(range(nu_dim), ncols=120):
+        TEmap = cf.iqu2teb(map_sim[nu], mask_in=mask_30, teb='te', lmax_sht=lmax, return_alm=False) #*ps_msk
 
-    #     wavelet_Tmaps.append(cf.alm2wavelet(beam_adjd_Tlm, bands, w_nside_max=nside))
-    #     wavelet_Emaps.append(cf.alm2wavelet(beam_adjd_Elm, bands, w_nside_max=nside))
-    # TEmap_act = cf.iqu2teb(cmb_sim, mask_in=mask_30, teb='te', lmax_sht=lmax, return_alm=False)
+        # if nu == 4: TEmap_act = cf.iqu2teb(cmb_sim[4], mask_in=mask_30, teb='te', lmax_sht=lmax, return_alm=False)
+
+        Tlms = hp.map2alm(TEmap[0]*mask_30, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts')
+        beam_adjd_Tlm = hp.almxfl(Tlms, Tbeam_ratios[nu])
+
+    # =============================================================
+        Elms = hp.map2alm(TEmap[1]*mask_30, lmax=lmax, pol=False, use_pixel_weights=True, datapath='/home/doujzh/DATA/HPX_pix_wgts')
+        beam_adjd_Elm = hp.almxfl(Elms, Ebeam_ratios[nu])
+
+        wavelet_Tmaps.append(cf.alm2wavelet(beam_adjd_Tlm, bands, w_nside_max=nside))
+        wavelet_Emaps.append(cf.alm2wavelet(beam_adjd_Elm, bands, w_nside_max=nside))
+    TEmap_act = cf.iqu2teb(cmb_sim, mask_in=mask_30, teb='te', lmax_sht=lmax, return_alm=False)
     
-    # nilc_Tmap_wav = []
-    # nilc_Emap_wav = []
+    nilc_Tmap_wav = []
+    nilc_Emap_wav = []
 
 
-    # nilc_Twgt_byband = []
-    # nilc_Ewgt_byband = []
+    nilc_Twgt_byband = []
+    nilc_Ewgt_byband = []
 
-    # nside_prev = -1
-    # nu_arr = np.arange(nu_dim, dtype=np.int_)
-    # for band in tqdm(range(nbands), ncols=120):
+    nside_prev = -1
+    nu_arr = np.arange(nu_dim, dtype=np.int_)
+    for band in tqdm(range(nbands), ncols=120):
 
-    #     lmax_band = cf.get_lmax_band(bands[:,band])
+        lmax_band = cf.get_lmax_band(bands[:,band])
 
-    #     # print(lmax_band, nu_arr[lmax_ch >= lmax_band])
+        # print(lmax_band, nu_arr[lmax_ch >= lmax_band])
 
-    #     # print(band)
-    #     Tnus_in_band = []
-    #     Enus_in_band = []
-    #     for nu in nu_arr[lmax_ch >= lmax_band]:
-    #         Tnus_in_band.append(wavelet_Tmaps[nu][band])
-    #         Enus_in_band.append(wavelet_Emaps[nu][band])
+        # print(band)
+        Tnus_in_band = []
+        Enus_in_band = []
+        for nu in nu_arr[lmax_ch >= lmax_band]:
+            Tnus_in_band.append(wavelet_Tmaps[nu][band])
+            Enus_in_band.append(wavelet_Emaps[nu][band])
 
-    #     nside_band = hp.npix2nside(len(Tnus_in_band[0]))
-    #     Twsp = nw.nilc_weights_new(Tnus_in_band)
-    #     Ewsp = nw.nilc_weights_new(Enus_in_band)
+        nside_band = hp.npix2nside(len(Tnus_in_band[0]))
+        Twsp = nw.nilc_weights_new(Tnus_in_band)
+        Ewsp = nw.nilc_weights_new(Enus_in_band)
 
-    #     T_nilc_wgts = Twsp.get_weights()
-    #     E_nilc_wgts = Ewsp.get_weights()
+        T_nilc_wgts = Twsp.get_weights()
+        E_nilc_wgts = Ewsp.get_weights()
 
-    #     # print(T_nilc_wgts.shape)
-    #     # np.savetxt(output_root+'/data/Tnilcweights_band'+str(band)+'_sim'+str(sim)+'.dat', T_nilc_wgts)
-    #     # np.savetxt(output_root+'/data/Enilcweights_band'+str(band)+'_sim'+str(sim)+'.dat', E_nilc_wgts)
+        # print(T_nilc_wgts.shape)
+        # np.savetxt(output_root+'/data/Tnilcweights_band'+str(band)+'_sim'+str(sim)+'.dat', T_nilc_wgts)
+        # np.savetxt(output_root+'/data/Enilcweights_band'+str(band)+'_sim'+str(sim)+'.dat', E_nilc_wgts)
 
-    #     for nu in range(np.sum(lmax_ch >= lmax_band)):
-    #         if nu == 0:
-    #             nilc_T_band = T_nilc_wgts[nu] * Tnus_in_band[nu]
-    #             nilc_E_band = E_nilc_wgts[nu] * Enus_in_band[nu]
+        for nu in range(np.sum(lmax_ch >= lmax_band)):
+            if nu == 0:
+                nilc_T_band = T_nilc_wgts[nu] * Tnus_in_band[nu]
+                nilc_E_band = E_nilc_wgts[nu] * Enus_in_band[nu]
 
-    #         else :
-    #             nilc_T_band += T_nilc_wgts[nu] * Tnus_in_band[nu]
-    #             nilc_E_band += E_nilc_wgts[nu] * Enus_in_band[nu]
+            else :
+                nilc_T_band += T_nilc_wgts[nu] * Tnus_in_band[nu]
+                nilc_E_band += E_nilc_wgts[nu] * Enus_in_band[nu]
 
-    #     nilc_Tmap_wav.append(nilc_T_band)
-    #     nilc_Emap_wav.append(nilc_E_band)
+        nilc_Tmap_wav.append(nilc_T_band)
+        nilc_Emap_wav.append(nilc_E_band)
 
-    #     # cf.plot_needlet_maps(T_nilc_wgts, proj='orth', outfile=output_root+'/maps/NILC_Twgts_band'+str(band)+'_sim'+str(sim)+'.png', show=False)
-    #     # cf.plot_needlet_maps(E_nilc_wgts, proj='orth', outfile=output_root+'/maps/NILC_Ewgts_band'+str(band)+'_sim'+str(sim)+'.png', show=False)
+        # cf.plot_needlet_maps(T_nilc_wgts, proj='orth', outfile=output_root+'/maps/NILC_Twgts_band'+str(band)+'_sim'+str(sim)+'.png', show=False)
+        # cf.plot_needlet_maps(E_nilc_wgts, proj='orth', outfile=output_root+'/maps/NILC_Ewgts_band'+str(band)+'_sim'+str(sim)+'.png', show=False)
 
-    #     nilc_Twgt_byband.append(T_nilc_wgts)
-    #     nilc_Ewgt_byband.append(E_nilc_wgts)
+        nilc_Twgt_byband.append(T_nilc_wgts)
+        nilc_Ewgt_byband.append(E_nilc_wgts)
 
-    #     # nside_prev = nside_band
+        # nside_prev = nside_band
 
-    #     del Enus_in_band, Ewsp, E_nilc_wgts, nilc_E_band, nilc_T_band, Tnus_in_band, Twsp, T_nilc_wgts
+        del Enus_in_band, Ewsp, E_nilc_wgts, nilc_E_band, nilc_T_band, Tnus_in_band, Twsp, T_nilc_wgts
 
-    # B_wsp = chilc.cilc_cleaner(Blmapo_sim, beams=beams[:,:,2], com_res_beam=beam_0[:,2])
+    B_wsp = chilc.cilc_cleaner(Blmapo_sim, beams=beams[:,:,2], com_res_beam=beam_0[:,2])
     
-    # print("Computing cILC weights")
-    # B_wsp.compute_cilc_weights(map_sel, bandpass='real', lmax_ch=lmax_ch)
-    # del Blmapo_sim
-    # ilc_wgts = np.reshape(B_wsp.har_wgts.T, (lmax+1, nu_dim,1))  # shape = (lmax+1, nu_dim, 1)
-    # np.savetxt(output_root+'/data/cILC_wgts_B_'+str(sim).zfill(3)+'.dat', B_wsp.har_wgts)
-    # cf.plot_ilc_weights(B_wsp.har_wgts, 'cILC', label_list=['K','95','100','143','150','217','353'], outfile=output_root+'/maps/cILC_Bwgts_sim'+str(sim)+'.png', show=False)
-    # print("Computing T NILC weights and map")
-    # T_nilc = cf.wavelet2map(nside, nilc_Tmap_wav, bands) * mask_20
-    # print("Computing E NILC weights and map")
-    # E_nilc = cf.wavelet2map(nside, nilc_Emap_wav, bands) * mask_20
+    print("Computing cILC weights")
+    B_wsp.compute_cilc_weights(map_sel, bandpass='real', lmax_ch=lmax_ch)
+    del Blmapo_sim
+    ilc_wgts = np.reshape(B_wsp.har_wgts.T, (lmax+1, nu_dim,1))  # shape = (lmax+1, nu_dim, 1)
+    np.savetxt(output_root+'/data/cILC_wgts_B_'+str(sim).zfill(3)+'.dat', B_wsp.har_wgts)
+    cf.plot_ilc_weights(B_wsp.har_wgts, 'cILC', label_list=['K','95','100','143','150','217','353'], outfile=output_root+'/maps/cILC_Bwgts_sim'+str(sim)+'.png', show=False)
+    print("Computing T NILC weights and map")
+    T_nilc = cf.wavelet2map(nside, nilc_Tmap_wav, bands) * mask_20
+    print("Computing E NILC weights and map")
+    E_nilc = cf.wavelet2map(nside, nilc_Emap_wav, bands) * mask_20
 
-    # print("Getting cILC B map")
-    # B_cilc = hp.alm2map(B_wsp.get_projected_alms(Blm_sim), nside, pol=False) * mask_UNP
+    print("Getting cILC B map")
+    B_cilc = hp.alm2map(B_wsp.get_projected_alms(Blm_sim), nside, pol=False) * mask_UNP
 
-    # B_dr = hp.alm2map(B_wsp.get_projected_alms(Blm_dr_sim), nside, pol=False) # deproj. residual
-    # hp.write_map(output_root+'/maps/deproj-residual_Bcilc_11arcmin_sim'+str(sim)+'.fits', B_dr, overwrite=True)
-    # B_dr = hp.read_map(output_root+'/maps/deproj-residual_Bcilc_11arcmin_sim'+str(sim)+'.fits', field=None, dtype=np.float64) * mask_UNP
+    B_dr = hp.alm2map(B_wsp.get_projected_alms(Blm_dr_sim), nside, pol=False) # deproj. residual
+    hp.write_map(output_root+'/maps/deproj-residual_Bcilc_11arcmin_sim'+str(sim)+'.fits', B_dr, overwrite=True)
+    B_dr = hp.read_map(output_root+'/maps/deproj-residual_Bcilc_11arcmin_sim'+str(sim)+'.fits', field=None, dtype=np.float64) * mask_UNP
     
-    # cf.plot_maps(T_nilc, mask_in=mask_20, proj='orth',  outfile=output_root+'/maps/Tnilc_sim'+str(sim)+'.png', show=False)
-    # cf.plot_maps(E_nilc, mask_in=mask_20, proj='orth',  outfile=output_root+'/maps/Enilc_sim'+str(sim)+'.png', show=False)
-    # cf.plot_maps(B_cilc, mask_in=mask_UNP, proj='orth', outfile=output_root+'/maps/Bcilc_sim'+str(sim)+'.png', show=False)
+    cf.plot_maps(T_nilc, mask_in=mask_20, proj='orth',  outfile=output_root+'/maps/Tnilc_sim'+str(sim)+'.png', show=False)
+    cf.plot_maps(E_nilc, mask_in=mask_20, proj='orth',  outfile=output_root+'/maps/Enilc_sim'+str(sim)+'.png', show=False)
+    cf.plot_maps(B_cilc, mask_in=mask_UNP, proj='orth', outfile=output_root+'/maps/Bcilc_sim'+str(sim)+'.png', show=False)
 
-    # cf.plot_maps(T_nilc - TEmap_act[0], mask_in=mask_20, proj='orth',  outfile=output_root+'/maps/Tres_sim'+str(sim)+'.png', show=False)
-    # cf.plot_maps(E_nilc - TEmap_act[1], mask_in=mask_20, proj='orth',  outfile=output_root+'/maps/Eres_sim'+str(sim)+'.png', show=False)
-    # cf.plot_maps(B_cilc - Bmap_act,     mask_in=mask_UNP, proj='orth', outfile=output_root+'/maps/Bres_sim'+str(sim)+'.png', show=False)
+    cf.plot_maps(T_nilc - TEmap_act[0], mask_in=mask_20, proj='orth',  outfile=output_root+'/maps/Tres_sim'+str(sim)+'.png', show=False)
+    cf.plot_maps(E_nilc - TEmap_act[1], mask_in=mask_20, proj='orth',  outfile=output_root+'/maps/Eres_sim'+str(sim)+'.png', show=False)
+    cf.plot_maps(B_cilc - Bmap_act,     mask_in=mask_UNP, proj='orth', outfile=output_root+'/maps/Bres_sim'+str(sim)+'.png', show=False)
 
-    # hp.write_map(output_root+'/maps/TEnilc-Bcilc_11arcmin_sim'+str(sim)+'.fits', [T_nilc, E_nilc, B_cilc], overwrite=True)
-    # hp.write_map(output_root+'/maps/tot-residual_TEnilc-Bcilc_11arcmin_sim'+str(sim)+'.fits', \
-    #     [(T_nilc - TEmap_act[0]) * mask_20, (E_nilc - TEmap_act[1]) * mask_20, (B_cilc - Bmap_act) * mask_UNP], overwrite=True)
-    # T_res = (T_nilc - TEmap_act[0]) * mask_20
-    # E_res = (E_nilc - TEmap_act[1]) * mask_20
-    # B_res = (B_cilc - Bmap_act) * mask_UNP
+    hp.write_map(output_root+'/maps/TEnilc-Bcilc_11arcmin_sim'+str(sim)+'.fits', [T_nilc, E_nilc, B_cilc], overwrite=True)
+    hp.write_map(output_root+'/maps/tot-residual_TEnilc-Bcilc_11arcmin_sim'+str(sim)+'.fits', \
+        [(T_nilc - TEmap_act[0]) * mask_20, (E_nilc - TEmap_act[1]) * mask_20, (B_cilc - Bmap_act) * mask_UNP], overwrite=True)
+    T_res = (T_nilc - TEmap_act[0]) * mask_20
+    E_res = (E_nilc - TEmap_act[1]) * mask_20
+    B_res = (B_cilc - Bmap_act) * mask_UNP
 
-    # wavelet_Tnoise = []
-    # wavelet_Enoise = []
-    # for nu in tqdm(range(nu_dim), ncols=120, leave=False):
-    #     TEnoise = cf.iqu2teb(noise_sim[nu], mask_in=mask_30, teb='te', lmax_sht=lmax, return_alm=True) #*ps_msk
+    wavelet_Tnoise = []
+    wavelet_Enoise = []
+    for nu in tqdm(range(nu_dim), ncols=120, leave=False):
+        TEnoise = cf.iqu2teb(noise_sim[nu], mask_in=mask_30, teb='te', lmax_sht=lmax, return_alm=True) #*ps_msk
 
-    #     beam_adjd_Nlm_T = hp.almxfl(TEnoise[0], Tbeam_ratios[nu])
-    #     beam_adjd_Nlm_E = hp.almxfl(TEnoise[1], Ebeam_ratios[nu])
+        beam_adjd_Nlm_T = hp.almxfl(TEnoise[0], Tbeam_ratios[nu])
+        beam_adjd_Nlm_E = hp.almxfl(TEnoise[1], Ebeam_ratios[nu])
 
-    #     wavelet_Tnoise.append(cf.alm2wavelet(beam_adjd_Nlm_T, bands, w_nside_max=nside))
-    #     wavelet_Enoise.append(cf.alm2wavelet(beam_adjd_Nlm_E, bands, w_nside_max=nside))
+        wavelet_Tnoise.append(cf.alm2wavelet(beam_adjd_Nlm_T, bands, w_nside_max=nside))
+        wavelet_Enoise.append(cf.alm2wavelet(beam_adjd_Nlm_E, bands, w_nside_max=nside))
 
-    # projTN_wav = []
-    # projEN_wav = []
+    projTN_wav = []
+    projEN_wav = []
 
-    # for band in tqdm(range(nbands), ncols=120, leave=False):
+    for band in tqdm(range(nbands), ncols=120, leave=False):
 
-    #     lmax_band = cf.get_lmax_band(bands[:,band])
+        lmax_band = cf.get_lmax_band(bands[:,band])
 
-    #     # print(lmax_band, nu_arr[lmax_ch >= lmax_band])
+        # print(lmax_band, nu_arr[lmax_ch >= lmax_band])
 
-    #     # print(band)
-    #     Tnus_in_band = []
-    #     Enus_in_band = []
-    #     for nu in nu_arr[lmax_ch >= lmax_band]:
-    #         Tnus_in_band.append(wavelet_Tnoise[nu][band])
-    #         Enus_in_band.append(wavelet_Enoise[nu][band])
+        # print(band)
+        Tnus_in_band = []
+        Enus_in_band = []
+        for nu in nu_arr[lmax_ch >= lmax_band]:
+            Tnus_in_band.append(wavelet_Tnoise[nu][band])
+            Enus_in_band.append(wavelet_Enoise[nu][band])
 
-    #     for nu in range(np.sum(lmax_ch >= lmax_band)):
-    #         if nu == 0:
-    #             nilc_T_band = nilc_Twgt_byband[band][nu] * Tnus_in_band[nu]
-    #             nilc_E_band = nilc_Ewgt_byband[band][nu] * Enus_in_band[nu]
+        for nu in range(np.sum(lmax_ch >= lmax_band)):
+            if nu == 0:
+                nilc_T_band = nilc_Twgt_byband[band][nu] * Tnus_in_band[nu]
+                nilc_E_band = nilc_Ewgt_byband[band][nu] * Enus_in_band[nu]
 
-    #         else :
-    #             nilc_T_band += nilc_Twgt_byband[band][nu] * Tnus_in_band[nu]
-    #             nilc_E_band += nilc_Ewgt_byband[band][nu] * Enus_in_band[nu]
+            else :
+                nilc_T_band += nilc_Twgt_byband[band][nu] * Tnus_in_band[nu]
+                nilc_E_band += nilc_Ewgt_byband[band][nu] * Enus_in_band[nu]
 
-    #     projTN_wav.append(nilc_T_band)
-    #     projEN_wav.append(nilc_E_band)
+        projTN_wav.append(nilc_T_band)
+        projEN_wav.append(nilc_E_band)
 
-    #     del Tnus_in_band, nilc_T_band, Enus_in_band, nilc_E_band
+        del Tnus_in_band, nilc_T_band, Enus_in_band, nilc_E_band
 
-    # T_nilc_noise = cf.wavelet2map(nside, projTN_wav, bands) * mask_20
-    # E_nilc_noise = cf.wavelet2map(nside, projEN_wav, bands) * mask_20
-    # B_cilc_noise = hp.alm2map(B_wsp.get_projected_alms(Nlm_sim), nside, pol=False) * mask_UNP
+    T_nilc_noise = cf.wavelet2map(nside, projTN_wav, bands) * mask_20
+    E_nilc_noise = cf.wavelet2map(nside, projEN_wav, bands) * mask_20
+    B_cilc_noise = hp.alm2map(B_wsp.get_projected_alms(Nlm_sim), nside, pol=False) * mask_UNP
 
-    # hp.write_map(output_root+'/maps/TEnilc-Bcilc_proj-noise_11arcmin_sim'+str(sim)+'.fits', [T_nilc_noise, E_nilc_noise, B_cilc_noise], overwrite=True)
-    # del map_sim, Blm_sim, B_wsp, Nlm_sim, noise_sim
+    hp.write_map(output_root+'/maps/TEnilc-Bcilc_proj-noise_11arcmin_sim'+str(sim)+'.fits', [T_nilc_noise, E_nilc_noise, B_cilc_noise], overwrite=True)
+    del map_sim, Blm_sim, B_wsp, Nlm_sim, noise_sim
 
-    clean_maps = hp.read_map(output_root+'/maps/TEnilc-Bcilc_11arcmin_sim'+str(sim)+'.fits', field=None, dtype=np.float64)
-    T_nilc, E_nilc, B_cilc = clean_maps[0], clean_maps[1], clean_maps[2]
-    res_maps = hp.read_map(output_root+'/maps/tot-residual_TEnilc-Bcilc_11arcmin_sim'+str(sim)+'.fits', field=None, dtype=np.float64)
-    T_res, E_res, B_res = res_maps[0], res_maps[1], res_maps[2]
-    res_noise = hp.read_map(output_root+'/maps/TEnilc-Bcilc_proj-noise_11arcmin_sim'+str(sim)+'.fits', field=None, dtype=np.float64)
-    T_nilc_noise, E_nilc_noise, B_cilc_noise = res_noise[0], res_noise[1], res_noise[2]
+    # clean_maps = hp.read_map(output_root+'/maps/TEnilc-Bcilc_11arcmin_sim'+str(sim)+'.fits', field=None, dtype=np.float64)
+    # T_nilc, E_nilc, B_cilc = clean_maps[0], clean_maps[1], clean_maps[2]
+    # res_maps = hp.read_map(output_root+'/maps/tot-residual_TEnilc-Bcilc_11arcmin_sim'+str(sim)+'.fits', field=None, dtype=np.float64)
+    # T_res, E_res, B_res = res_maps[0], res_maps[1], res_maps[2]
+    # res_noise = hp.read_map(output_root+'/maps/TEnilc-Bcilc_proj-noise_11arcmin_sim'+str(sim)+'.fits', field=None, dtype=np.float64)
+    # T_nilc_noise, E_nilc_noise, B_cilc_noise = res_noise[0], res_noise[1], res_noise[2]
 
     # B_res = hp.read_map(output_root+'/maps/tot-residual_TEnilc-Bcilc_11arcmin_sim'+str(sim)+'.fits', field=None, dtype=np.float64)[2]
     # B_cilc_noise = hp.read_map(output_root+'/maps/TEnilc-Bcilc_proj-noise_11arcmin_sim'+str(sim)+'.fits', field=None, dtype=np.float64)[2]
@@ -407,18 +407,18 @@ for sim in tqdm(range(start_sim, start_sim + nsims), ncols=120):
         Dl_BB = cf.map2Cl_nmt(B_cilc, mask_apo, bins, lmax_sht=lmax, beam=beam_0[:,2], noise_Cl=Nl_coup_BB, masked_on_input=False, reuse_wsp=Bwsp_nmt)
         Dl_TE = cf.map2Cl_nmt(T_nilc, mask_c2, bins, map_in2=E_nilc, lmax_sht=lmax, beam=beam_0[:,0], beam2=beam_0[:,1], reuse_wsp=Xwsp_nmt)
 
-    # if sim == start_sim:
-    #     Dl_BB_dr, Bwsp_nmt = cf.map2Cl_nmt(B_dr, mask_apo, bins_BB, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, return_wsp=True)
-    # else:
-    #     Dl_BB_dr = cf.map2Cl_nmt(B_dr, mask_apo, bins_BB, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
-    # resNl_BB = cf.map2Cl_nmt(B_cilc_noise, mask_apo, bins_BB, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
-    # resFGpD_BB = cf.map2Cl_nmt(B_res - B_cilc_noise, mask_apo, bins_BB, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
-    # resFG_BB = cf.map2Cl_nmt(B_res - B_cilc_noise - B_dr, mask_apo, bins_BB, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
+    if sim == start_sim:
+        Dl_BB_dr, Bwsp_nmt = cf.map2Cl_nmt(B_dr, mask_apo, bins_BB, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, return_wsp=True)
+    else:
+        Dl_BB_dr = cf.map2Cl_nmt(B_dr, mask_apo, bins_BB, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
+    resNl_BB = cf.map2Cl_nmt(B_cilc_noise, mask_apo, bins_BB, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
+    resFGpD_BB = cf.map2Cl_nmt(B_res - B_cilc_noise, mask_apo, bins_BB, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
+    resFG_BB = cf.map2Cl_nmt(B_res - B_cilc_noise - B_dr, mask_apo, bins_BB, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
 
-    # resDl_TT = cf.map2Cl_nmt(T_res, mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,0],  reuse_wsp=Twsp_nmt)
-    # resDl_EE = cf.map2Cl_nmt(E_res, mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,1],  reuse_wsp=Ewsp_nmt)
-    # resDl_BB = cf.map2Cl_nmt(B_res, mask_apo, bins, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
-    # resDl_TE = cf.map2Cl_nmt(T_res, mask_c2, bins, map_in2=E_res * mask_20, lmax_sht=lmax, beam=beam_0[:,0], beam2=beam_0[:,1], reuse_wsp=Xwsp_nmt)
+    resDl_TT = cf.map2Cl_nmt(T_res, mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,0],  reuse_wsp=Twsp_nmt)
+    resDl_EE = cf.map2Cl_nmt(E_res, mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,1],  reuse_wsp=Ewsp_nmt)
+    resDl_BB = cf.map2Cl_nmt(B_res, mask_apo, bins, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
+    resDl_TE = cf.map2Cl_nmt(T_res, mask_c2, bins, map_in2=E_res * mask_20, lmax_sht=lmax, beam=beam_0[:,0], beam2=beam_0[:,1], reuse_wsp=Xwsp_nmt)
 
     resFGpD_TT = cf.map2Cl_nmt(T_res - T_nilc_noise, mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,0],  reuse_wsp=Twsp_nmt)
     resFGpD_EE = cf.map2Cl_nmt(E_res - E_nilc_noise, mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,1],  reuse_wsp=Ewsp_nmt)
@@ -428,14 +428,14 @@ for sim in tqdm(range(start_sim, start_sim + nsims), ncols=120):
     resNl_TT = cf.map2Cl_nmt(T_nilc_noise, mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,0],  reuse_wsp=Twsp_nmt)
     resNl_EE = cf.map2Cl_nmt(E_nilc_noise, mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,1],  reuse_wsp=Ewsp_nmt)
     resNl_BB = cf.map2Cl_nmt(B_cilc_noise, mask_apo, bins, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
-    # del T_nilc, E_nilc, B_cilc, T_nilc_noise, E_nilc_noise, B_cilc_noise
+    del T_nilc, E_nilc, B_cilc, T_nilc_noise, E_nilc_noise, B_cilc_noise
 
-    # Dl_TT_cmb = cf.map2Cl_nmt(TEmap_act[0], mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,0], reuse_wsp=Twsp_nmt)
-    # Dl_EE_cmb = cf.map2Cl_nmt(TEmap_act[1], mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,1], reuse_wsp=Ewsp_nmt)
-    # Dl_BB_cmb = cf.map2Cl_nmt(Bmap_act, mask_apo, bins, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
-    # Dl_TE_cmb = cf.map2Cl_nmt(TEmap_act[0], mask_c2, bins, map_in2=TEmap_act[1], lmax_sht=lmax, beam=beam_0[:,0], beam2=beam_0[:,1], reuse_wsp=Xwsp_nmt)
+    Dl_TT_cmb = cf.map2Cl_nmt(TEmap_act[0], mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,0], reuse_wsp=Twsp_nmt)
+    Dl_EE_cmb = cf.map2Cl_nmt(TEmap_act[1], mask_c2, bins, lmax_sht=lmax, beam=beam_0[:,1], reuse_wsp=Ewsp_nmt)
+    Dl_BB_cmb = cf.map2Cl_nmt(Bmap_act, mask_apo, bins, lmax_sht=lmax, beam=beam_0[:,2], masked_on_input=False, reuse_wsp=Bwsp_nmt)
+    Dl_TE_cmb = cf.map2Cl_nmt(TEmap_act[0], mask_c2, bins, map_in2=TEmap_act[1], lmax_sht=lmax, beam=beam_0[:,0], beam2=beam_0[:,1], reuse_wsp=Xwsp_nmt)
 
-    Dl_TT_cmb, Dl_EE_cmb, Dl_BB_cmb, Dl_TE_cmb = np.loadtxt(output_root+'/data/Dl_actcmb_sim'+str(sim).zfill(3)+'.dat')[[1,2,3,4]]
+    # Dl_TT_cmb, Dl_EE_cmb, Dl_BB_cmb, Dl_TE_cmb = np.loadtxt(output_root+'/data/Dl_actcmb_sim'+str(sim).zfill(3)+'.dat')[[1,2,3,4]]
 
     np.savetxt(output_root+'/data/Dl_tot_sim'+str(sim).zfill(3)+'.dat', [leff, Dl_TT[0], Dl_EE[0], Dl_BB[0], Dl_TE[0], \
     resFGpD_TT[0], resFGpD_EE[0], resFGpD_BB[0], resFGpD_TE[0], \
@@ -443,35 +443,35 @@ for sim in tqdm(range(start_sim, start_sim + nsims), ncols=120):
 
     np.savetxt(output_root+'/data/Dl_actcmb_sim'+str(sim).zfill(3)+'.dat', [leff, Dl_TT_cmb, Dl_EE_cmb, Dl_BB_cmb, Dl_TE_cmb])
 
-    # np.savetxt(output_root+'/data/no_fix_bin/Dl_BB_deproj_res_sim'+str(sim).zfill(3)+'.dat', [leff_BB, Dl_BB_dr[0], resNl_BB[0], resFGpD_BB[0], resFG_BB[0]])
-    # tot_Dl = np.loadtxt(output_root+'/data/no_fix_bin/Dl_BB_deproj_res_sim'+str(sim).zfill(3)+'.dat')
-    # Dl_BB_dr, resNl_BB, resFGpD_BB, resFG_BB = tot_Dl[[1,2,3,4]]
+    np.savetxt(output_root+'/data/no_fix_bin/Dl_BB_deproj_res_sim'+str(sim).zfill(3)+'.dat', [leff_BB, Dl_BB_dr[0], resNl_BB[0], resFGpD_BB[0], resFG_BB[0]])
+    tot_Dl = np.loadtxt(output_root+'/data/no_fix_bin/Dl_BB_deproj_res_sim'+str(sim).zfill(3)+'.dat')
+    Dl_BB_dr, resNl_BB, resFGpD_BB, resFG_BB = tot_Dl[[1,2,3,4]]
 
-    # tot_Dl = np.loadtxt(output_root+'/data/no_fix_bin/Dl_tot_sim'+str(sim).zfill(3)+'.dat')
-    # Dl_BB, Dl_BB_cmb = tot_Dl[[3, 14]]
+    tot_Dl = np.loadtxt(output_root+'/data/no_fix_bin/Dl_tot_sim'+str(sim).zfill(3)+'.dat')
+    Dl_BB, Dl_BB_cmb = tot_Dl[[3, 14]]
 
-    # if sim == 0:
-    #         Dl_TT_mean, Dl_EE_mean, Dl_BB_mean, Dl_TE_mean, \
-    #         resDl_TT_mean, resDl_EE_mean, resDl_BB_mean, resDl_TE_mean, \
-    #         resNl_TT_mean, resNl_EE_mean, resNl_BB_mean = \
-    #         [], [], [], [], \
-    #         [], [], [], [], \
-    #         [], [], []
-    # leff, Dl_TT, Dl_EE, Dl_BB, Dl_TE, \
-    # resDl_TT, resDl_EE, resDl_BB, resDl_TE, \
-    # resNl_TT, resNl_EE, resNl_BB, \
-    # Dl_TT_cmb, Dl_EE_cmb, Dl_BB_cmb, Dl_TE_cmb = np.loadtxt(output_root+'/data/Dl_tot_sim'+str(sim).zfill(3)+'.dat')
-    # Dl_TT_mean.append(Dl_TT)
-    # Dl_EE_mean.append(Dl_EE)
-    # Dl_BB_mean.append(Dl_BB)
-    # Dl_TE_mean.append(Dl_TE)
-    # resDl_TT_mean.append(resDl_TT)
-    # resDl_EE_mean.append(resDl_EE)
-    # resDl_BB_mean.append(resDl_BB)
-    # resDl_TE_mean.append(resDl_TE)
-    # resNl_TT_mean.append(resNl_TT)
-    # resNl_EE_mean.append(resNl_EE)
-    # resNl_BB_mean.append(resNl_BB)
+    if sim == 0:
+            Dl_TT_mean, Dl_EE_mean, Dl_BB_mean, Dl_TE_mean, \
+            resDl_TT_mean, resDl_EE_mean, resDl_BB_mean, resDl_TE_mean, \
+            resNl_TT_mean, resNl_EE_mean, resNl_BB_mean = \
+            [], [], [], [], \
+            [], [], [], [], \
+            [], [], []
+    leff, Dl_TT, Dl_EE, Dl_BB, Dl_TE, \
+    resDl_TT, resDl_EE, resDl_BB, resDl_TE, \
+    resNl_TT, resNl_EE, resNl_BB, \
+    Dl_TT_cmb, Dl_EE_cmb, Dl_BB_cmb, Dl_TE_cmb = np.loadtxt(output_root+'/data/Dl_tot_sim'+str(sim).zfill(3)+'.dat')
+    Dl_TT_mean.append(Dl_TT)
+    Dl_EE_mean.append(Dl_EE)
+    Dl_BB_mean.append(Dl_BB)
+    Dl_TE_mean.append(Dl_TE)
+    resDl_TT_mean.append(resDl_TT)
+    resDl_EE_mean.append(resDl_EE)
+    resDl_BB_mean.append(resDl_BB)
+    resDl_TE_mean.append(resDl_TE)
+    resNl_TT_mean.append(resNl_TT)
+    resNl_EE_mean.append(resNl_EE)
+    resNl_BB_mean.append(resNl_BB)
 
 
     fno, fig, ax = cf.make_plotaxes()
@@ -535,96 +535,79 @@ for sim in tqdm(range(start_sim, start_sim + nsims), ncols=120):
     # ax.grid(which='both', axis='both')
     plt.savefig(output_root+'/plots/DlBB_cILC_sim_'+str(sim)+'.png',bbox_inches='tight',pad_inches=0.1)
 
-    # fno, fig, ax = cf.make_plotaxes()
-    # ax.plot(ells[40:lmax_o+1], Dell_factor[40:lmax_o+1]*cl_bb[40:lmax_o+1], 'k-', label='BB input')
-    # ax.plot(leff_BB[1:], Dl_BB[1:], 'o', lw=1.8, alpha=0.7, ms=3., label='cILC')
-    # ax.plot(leff_BB[1:], resNl_BB[1:], '-', lw=1.8, alpha=0.7, ms=3., label='res. noise')
-    # ax.plot(leff_BB[1:], resFGpD_BB[1:], '-', lw=1.8, alpha=0.7, ms=3., label='total res. - res.noise')
-    # ax.plot(leff_BB[1:], Dl_BB_dr[1:], '-', lw=1.8, alpha=0.7, ms=3., label='deproj. res.')
-    # ax.plot(leff_BB[1:], resFG_BB[1:], '-', lw=1.8, alpha=0.7, ms=3., label='total res. - res.noise - deproj. res.')
-    # ax.plot(leff_BB[1:], Dl_BB_cmb[1:], 'o', lw=1.8, alpha=0.7, ms=3., label='Actual CMB')
-    # ax.set_xlabel(r'$\ell$')
-    # ax.set_ylabel(r'$\mathcal{D}^{BB}_\ell$ [in $\mu$K${}^2$]')
-    # ax.legend(loc='best', frameon=False, fontsize=12)
-    # ax.set_xscale('log')
-    # ax.set_yscale('log')
-    # # ax.set_ylim(ymin=1.e-3, ymax=1.e2)
-    # # ax.grid(which='both', axis='both')
-    # plt.savefig(output_root+'/plots/DlBB_cILC_sim_'+str(sim)+'_nofixbin.png',bbox_inches='tight',pad_inches=0.1)
+    del Dl_TT, Dl_EE, Dl_TE, Dl_BB, TEmap_act, Bmap_act
 
-    # del Dl_TT, Dl_EE, Dl_TE, Dl_BB, TEmap_act, Bmap_act
-
-# e_Dl_TT = np.std(Dl_TT_mean, axis=0)
-# e_Dl_EE = np.std(Dl_EE_mean, axis=0)
-# e_Dl_TE = np.std(Dl_TE_mean, axis=0)
-# e_Dl_BB = np.std(Dl_BB_mean, axis=0)
-# Dl_TT_mean = np.mean(Dl_TT_mean, axis=0)
-# Dl_EE_mean = np.mean(Dl_EE_mean, axis=0)
-# Dl_BB_mean = np.mean(Dl_BB_mean, axis=0)
-# Dl_TE_mean = np.mean(Dl_TE_mean, axis=0)
-# resDl_TT_mean = np.mean(resDl_TT_mean, axis=0)
-# resDl_EE_mean = np.mean(resDl_EE_mean, axis=0)
-# resDl_BB_mean = np.mean(resDl_BB_mean, axis=0)
-# resDl_TE_mean = np.mean(resDl_TE_mean, axis=0)
-# resNl_TT_mean = np.mean(resNl_TT_mean, axis=0)
-# resNl_EE_mean = np.mean(resNl_EE_mean, axis=0)
-# resNl_BB_mean = np.mean(resNl_BB_mean, axis=0)
+e_Dl_TT = np.std(Dl_TT_mean, axis=0)
+e_Dl_EE = np.std(Dl_EE_mean, axis=0)
+e_Dl_TE = np.std(Dl_TE_mean, axis=0)
+e_Dl_BB = np.std(Dl_BB_mean, axis=0)
+Dl_TT_mean = np.mean(Dl_TT_mean, axis=0)
+Dl_EE_mean = np.mean(Dl_EE_mean, axis=0)
+Dl_BB_mean = np.mean(Dl_BB_mean, axis=0)
+Dl_TE_mean = np.mean(Dl_TE_mean, axis=0)
+resDl_TT_mean = np.mean(resDl_TT_mean, axis=0)
+resDl_EE_mean = np.mean(resDl_EE_mean, axis=0)
+resDl_BB_mean = np.mean(resDl_BB_mean, axis=0)
+resDl_TE_mean = np.mean(resDl_TE_mean, axis=0)
+resNl_TT_mean = np.mean(resNl_TT_mean, axis=0)
+resNl_EE_mean = np.mean(resNl_EE_mean, axis=0)
+resNl_BB_mean = np.mean(resNl_BB_mean, axis=0)
     
-# fno, fig, ax = cf.make_plotaxes()
-# ax.plot(ells[40:lmax_o+1], Dell_factor[40:lmax_o+1]*cl_tt[40:lmax_o+1], 'k-', label='TT input')
-# ax.errorbar(leff[1:], Dl_TT_mean[1:], yerr=np.abs(e_Dl_TT[1:]),fmt='s', lw=1.8, alpha=0.7, ms=4., label='NILC')
-# ax.plot(leff[1:], resNl_TT_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='residual noise')
-# ax.plot(leff[1:], resDl_TT_mean[1:] - resNl_TT_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='total residual - res.noise')
-# # ax.plot(leff[1:], Dl_TT_cmb_mean[1:], 'o', lw=1.8, alpha=0.7, ms=3., label='Actual CMB')
-# ax.set_xlabel(r'$\ell$')
-# ax.set_ylabel(r'$\mathcal{D}^{TT}_\ell$ [in $\mu$K${}^2$]')
-# ax.legend(loc='best', frameon=False, fontsize=12)
-# ax.set_xscale('log')
-# ax.set_yscale('log')
-# # ax.set_ylim(ymin=1.e0, ymax=1.e4)
-# # ax.grid(which='both', axis='both')
-# plt.savefig(output_root+'/DlTT_NILC.png',bbox_inches='tight',pad_inches=0.1)
+fno, fig, ax = cf.make_plotaxes()
+ax.plot(ells[40:lmax_o+1], Dell_factor[40:lmax_o+1]*cl_tt[40:lmax_o+1], 'k-', label='TT input')
+ax.errorbar(leff[1:], Dl_TT_mean[1:], yerr=np.abs(e_Dl_TT[1:]),fmt='s', lw=1.8, alpha=0.7, ms=4., label='NILC')
+ax.plot(leff[1:], resNl_TT_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='residual noise')
+ax.plot(leff[1:], resDl_TT_mean[1:] - resNl_TT_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='total residual - res.noise')
+# ax.plot(leff[1:], Dl_TT_cmb_mean[1:], 'o', lw=1.8, alpha=0.7, ms=3., label='Actual CMB')
+ax.set_xlabel(r'$\ell$')
+ax.set_ylabel(r'$\mathcal{D}^{TT}_\ell$ [in $\mu$K${}^2$]')
+ax.legend(loc='best', frameon=False, fontsize=12)
+ax.set_xscale('log')
+ax.set_yscale('log')
+# ax.set_ylim(ymin=1.e0, ymax=1.e4)
+# ax.grid(which='both', axis='both')
+plt.savefig(output_root+'/DlTT_NILC.png',bbox_inches='tight',pad_inches=0.1)
 
-# fno, fig, ax = cf.make_plotaxes()
-# ax.plot(ells[40:lmax_o+1], Dell_factor[40:lmax_o+1]*cl_ee[40:lmax_o+1], 'k-', label='EE input')
-# ax.errorbar(leff[1:], Dl_EE_mean[1:], yerr=np.abs(e_Dl_EE[1:]),fmt='s', lw=1.8, alpha=0.7, ms=4., label='NILC')
-# ax.plot(leff[1:], resNl_EE_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='residual noise')
-# ax.plot(leff[1:], resDl_EE_mean[1:] - resNl_EE_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='total residual - res.noise')
-# # ax.plot(leff[1:], Dl_EE_cmb_mean[1:], 'o', lw=1.8, alpha=0.7, ms=3., label='Actual CMB')
-# ax.set_xlabel(r'$\ell$')
-# ax.set_ylabel(r'$\mathcal{D}^{EE}_\ell$ [in $\mu$K${}^2$]')
-# ax.legend(loc='best', frameon=False, fontsize=12)
-# ax.set_xscale('log')
-# ax.set_yscale('log')
-# # ax.set_ylim(ymin=1.e-3, ymax=1.e2)
-# # ax.grid(which='both', axis='both')
-# plt.savefig(output_root+'/DlEE_NILC.png',bbox_inches='tight',pad_inches=0.1)
+fno, fig, ax = cf.make_plotaxes()
+ax.plot(ells[40:lmax_o+1], Dell_factor[40:lmax_o+1]*cl_ee[40:lmax_o+1], 'k-', label='EE input')
+ax.errorbar(leff[1:], Dl_EE_mean[1:], yerr=np.abs(e_Dl_EE[1:]),fmt='s', lw=1.8, alpha=0.7, ms=4., label='NILC')
+ax.plot(leff[1:], resNl_EE_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='residual noise')
+ax.plot(leff[1:], resDl_EE_mean[1:] - resNl_EE_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='total residual - res.noise')
+# ax.plot(leff[1:], Dl_EE_cmb_mean[1:], 'o', lw=1.8, alpha=0.7, ms=3., label='Actual CMB')
+ax.set_xlabel(r'$\ell$')
+ax.set_ylabel(r'$\mathcal{D}^{EE}_\ell$ [in $\mu$K${}^2$]')
+ax.legend(loc='best', frameon=False, fontsize=12)
+ax.set_xscale('log')
+ax.set_yscale('log')
+# ax.set_ylim(ymin=1.e-3, ymax=1.e2)
+# ax.grid(which='both', axis='both')
+plt.savefig(output_root+'/DlEE_NILC.png',bbox_inches='tight',pad_inches=0.1)
 
-# fno, fig, ax = cf.make_plotaxes()
-# ax.plot(ells[40:lmax_o+1], Dell_factor[40:lmax_o+1]*(cl_te)[40:lmax_o+1], 'k-', label='TE input')
-# ax.errorbar(leff[1:], Dl_TE_mean[1:], yerr=np.abs(e_Dl_TE[1:]),fmt='s', lw=1.8, alpha=0.7, ms=4., label='NILC')
-# ax.plot(leff[1:], (resDl_TE_mean)[1:], '-', lw=1.8, alpha=0.7, ms=3., label='total residual')
-# # ax.plot(leff[1:], Dl_TE_cmb_mean[1:], 'o', lw=1.8, alpha=0.7, ms=3., label='Actual CMB')
-# ax.set_xlabel(r'$\ell$')
-# ax.set_ylabel(r'$\mathcal{D}^{TE}_\ell$ [in $\mu$K${}^2$]')
-# ax.legend(loc='best', frameon=False, fontsize=12)
-# ax.set_xscale('log')
-# # ax.set_yscale('log')
-# # ax.set_ylim(ymin=5.e-2, ymax=2.e2)
-# # ax.grid(which='both', axis='both')
-# plt.savefig(output_root+'/DlTE_NILC.png',bbox_inches='tight',pad_inches=0.1)
-
-# fno, fig, ax = cf.make_plotaxes()
-# ax.plot(ells[40:lmax_o+1], Dell_factor[40:lmax_o+1]*cl_bb[40:lmax_o+1], 'k-', label='BB input')
-# ax.errorbar(leff[1:], Dl_BB_mean[1:], yerr=np.abs(e_Dl_BB[1:]),fmt='s', lw=1.8, alpha=0.7, ms=4., label='cILC')
-# ax.plot(leff[1:], resNl_BB_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='residual noise')
-# ax.plot(leff[1:], resDl_BB_mean[1:] - resNl_BB_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='total residual - res.noise')
-# # ax.plot(leff[1:], Dl_BB_cmb_mean[1:], 'o', lw=1.8, alpha=0.7, ms=3., label='Actual CMB')
-# ax.set_xlabel(r'$\ell$')
-# ax.set_ylabel(r'$\mathcal{D}^{BB}_\ell$ [in $\mu$K${}^2$]')
-# ax.legend(loc='best', frameon=False, fontsize=12)
-# ax.set_xscale('log')
+fno, fig, ax = cf.make_plotaxes()
+ax.plot(ells[40:lmax_o+1], Dell_factor[40:lmax_o+1]*(cl_te)[40:lmax_o+1], 'k-', label='TE input')
+ax.errorbar(leff[1:], Dl_TE_mean[1:], yerr=np.abs(e_Dl_TE[1:]),fmt='s', lw=1.8, alpha=0.7, ms=4., label='NILC')
+ax.plot(leff[1:], (resDl_TE_mean)[1:], '-', lw=1.8, alpha=0.7, ms=3., label='total residual')
+# ax.plot(leff[1:], Dl_TE_cmb_mean[1:], 'o', lw=1.8, alpha=0.7, ms=3., label='Actual CMB')
+ax.set_xlabel(r'$\ell$')
+ax.set_ylabel(r'$\mathcal{D}^{TE}_\ell$ [in $\mu$K${}^2$]')
+ax.legend(loc='best', frameon=False, fontsize=12)
+ax.set_xscale('log')
 # ax.set_yscale('log')
-# # ax.set_ylim(ymin=1.e-3, ymax=1.e2)
-# # ax.grid(which='both', axis='both')
-# plt.savefig(output_root+'/DlBB_cILC.png',bbox_inches='tight',pad_inches=0.1)
+# ax.set_ylim(ymin=5.e-2, ymax=2.e2)
+# ax.grid(which='both', axis='both')
+plt.savefig(output_root+'/DlTE_NILC.png',bbox_inches='tight',pad_inches=0.1)
+
+fno, fig, ax = cf.make_plotaxes()
+ax.plot(ells[40:lmax_o+1], Dell_factor[40:lmax_o+1]*cl_bb[40:lmax_o+1], 'k-', label='BB input')
+ax.errorbar(leff[1:], Dl_BB_mean[1:], yerr=np.abs(e_Dl_BB[1:]),fmt='s', lw=1.8, alpha=0.7, ms=4., label='cILC')
+ax.plot(leff[1:], resNl_BB_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='residual noise')
+ax.plot(leff[1:], resDl_BB_mean[1:] - resNl_BB_mean[1:], '-', lw=1.8, alpha=0.7, ms=3., label='total residual - res.noise')
+# ax.plot(leff[1:], Dl_BB_cmb_mean[1:], 'o', lw=1.8, alpha=0.7, ms=3., label='Actual CMB')
+ax.set_xlabel(r'$\ell$')
+ax.set_ylabel(r'$\mathcal{D}^{BB}_\ell$ [in $\mu$K${}^2$]')
+ax.legend(loc='best', frameon=False, fontsize=12)
+ax.set_xscale('log')
+ax.set_yscale('log')
+# ax.set_ylim(ymin=1.e-3, ymax=1.e2)
+# ax.grid(which='both', axis='both')
+plt.savefig(output_root+'/DlBB_cILC.png',bbox_inches='tight',pad_inches=0.1)
