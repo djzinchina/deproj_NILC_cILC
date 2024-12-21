@@ -25,10 +25,10 @@ def ugrade_wgt(weights, nside_up):
         n_valid_ch = len(weights[:,0])
         s2nind = su.npix2spix_map(nside_up, nside_low)
 
-        nilc_wgts_mapped = np.zeros((n_valid_ch, hp.nside2npix(nside_up)))
-        nilc_wgts_mapped = weights[:, s2nind]
+        ngls_wgts_mapped = np.zeros((n_valid_ch, hp.nside2npix(nside_up)))
+        ngls_wgts_mapped = weights[:, s2nind]
 
-        return nilc_wgts_mapped
+        return ngls_wgts_mapped
 
 def compute_Ncov(Nlms_in, bands, lmax_ch, beams, com_res_beam, cov_method='supix', ilc_bias=0.03):
     nu_dim = len(Nlms_in)
@@ -89,7 +89,7 @@ class ngls_workspace:
         Selects which of TEB is to be analysed in case of IQU map input. Default is 0.
     mask : numpy array, optional
         A numpy 1d array containing the binary mask required for SHT of partial sky
-        maps. Note that nilc weights do not consider masking. Default is ``None``, which
+        maps. Note that ngls weights do not consider masking. Default is ``None``, which
         does SHT without masking.
     lmax_sht : int, optional
         Specifies the \(\\ell_{\\rm max}\) for SHT of maps. It is suggested to set this 
@@ -220,7 +220,7 @@ class ngls_workspace:
         else:
             self.lmax_ch = lmax_ch
 
-        nilc_wavelet_maps = []
+        ngls_wavelet_maps = []
         for band in tqdm(range(self.nbands), ncols=120):
 
             lmax_band = wv.get_lmax_band(self.bands[:,band])
@@ -272,7 +272,7 @@ class ngls_workspace:
             # print(weights.shape)
 
             if self.low_memory:
-                np.save(self.scratch+'/nilc_weights_env-'+self.env_id+'_band'+str(band)+'.npy', weights)
+                np.save(self.scratch+'/ngls_weights_env-'+self.env_id+'_band'+str(band)+'.npy', weights)
             else:
                 if band == 0:
                     self.weights_by_band = []
@@ -289,12 +289,12 @@ class ngls_workspace:
                 
                 del wgts_by_nu, map_nus_in_band
 
-                nilc_wavelet_maps.append(cleaned_wav)
+                ngls_wavelet_maps.append(cleaned_wav)
 
         self.weights_done = True 
 
         if return_clean_map:
-            return wv.wavelet2map(self.nside, nilc_wavelet_maps, self.bands) * self.mask
+            return wv.wavelet2map(self.nside, ngls_wavelet_maps, self.bands) * self.mask
 
 
     def get_ngls_maps(self, comp=0):
@@ -302,7 +302,7 @@ class ngls_workspace:
             
             nu_arr = np.arange(self.nu_dim, dtype=np.int_)
 
-            nilc_wavelet_maps = []
+            ngls_wavelet_maps = []
             for band in range(self.nbands):
                 lmax_band = wv.get_lmax_band(self.bands[:,band])
                 map_nus_in_band = []
@@ -315,7 +315,7 @@ class ngls_workspace:
                 n_valid_ch = len(nu_arr[self.lmax_ch >= lmax_band])
 
                 if self.low_memory:
-                    weights = np.load(self.scratch+'/nilc_weights_env-'+self.env_id+'_band'+str(band)+'.npy')
+                    weights = np.load(self.scratch+'/ngls_weights_env-'+self.env_id+'_band'+str(band)+'.npy')
                 else:
                     weights = self.weights_by_band[band]
 
@@ -329,14 +329,14 @@ class ngls_workspace:
                     else:
                         cleaned_wav += wgts_by_nu[nu] * map_nus_in_band[nu]
 
-                nilc_wavelet_maps.append(cleaned_wav)
+                ngls_wavelet_maps.append(cleaned_wav)
 
                 del wgts_by_nu, map_nus_in_band, cleaned_wav
             
-            return wv.wavelet2map(self.nside, nilc_wavelet_maps, self.bands) * self.mask
+            return wv.wavelet2map(self.nside, ngls_wavelet_maps, self.bands) * self.mask
 
         else:
-            print("ERROR: NILC weights not computed. Aborting...")
+            print("ERROR: NGLS weights not computed. Aborting...")
             exit()
 
     def get_projected_map(self, maps_in, TEB=0, adjust_beam=True, comp=0):
@@ -384,7 +384,7 @@ class ngls_workspace:
             
             nu_arr = np.arange(self.nu_dim, dtype=np.int_)
 
-            nilc_wavelet_proj = []
+            ngls_wavelet_proj = []
             for band in range(self.nbands):
                 lmax_band = wv.get_lmax_band(self.bands[:,band])
 
@@ -398,7 +398,7 @@ class ngls_workspace:
                 n_valid_ch = len(nu_arr[self.lmax_ch >= lmax_band])
 
                 if self.low_memory:
-                    weights = np.load(self.scratch+'/nilc_weights_env-'+self.env_id+'_band'+str(band)+'.npy')
+                    weights = np.load(self.scratch+'/ngls_weights_env-'+self.env_id+'_band'+str(band)+'.npy')
                 else:
                     weights = self.weights_by_band[band]
 
@@ -412,17 +412,17 @@ class ngls_workspace:
                     else:
                         cleaned_wav += wgts_by_nu[nu] * map_nus_in_band[nu]
 
-                nilc_wavelet_proj.append(cleaned_wav)
+                ngls_wavelet_proj.append(cleaned_wav)
 
                 del wgts_by_nu, map_nus_in_band, cleaned_wav
 
             if np.logical_not(self.low_memory):
                 del proj_wavelet_maps
             
-            return wv.wavelet2map(self.nside, nilc_wavelet_proj, self.bands) * self.mask
+            return wv.wavelet2map(self.nside, ngls_wavelet_proj, self.bands) * self.mask
 
         else:
-            print("ERROR: NILC weights not computed. Aborting...")
+            print("ERROR: NGLS weights not computed. Aborting...")
             exit()
 
 
@@ -435,7 +435,7 @@ class ngls_workspace:
             print("Nothing to do. Not using scratch.")
 
     
-    def plot_nilc_weights(self, freqs, comp=0, mask=None, wgt_type='CMB', label_list=None, outfile=None, resol='screen', show=True):
+    def plot_ngls_weights(self, freqs, comp=0, mask=None, wgt_type='CMB', label_list=None, outfile=None, resol='screen', show=True):
         if self.weights_done:
             nu_arr = np.arange(self.nu_dim, dtype=np.int_)
 
@@ -455,7 +455,7 @@ class ngls_workspace:
                 lmax_band = wv.get_lmax_band(self.bands[:,band])
 
                 if self.low_memory:
-                    weights = np.load(self.scratch+'/nilc_weights_env-'+self.env_id+'_band'+str(band)+'.npy')
+                    weights = np.load(self.scratch+'/ngls_weights_env-'+self.env_id+'_band'+str(band)+'.npy')
                 else:
                     weights = self.weights_by_band[band]
                 wgts_by_nu = ugrade_wgt(weights[comp], hp.npix2nside(len(mask_in)))
@@ -470,7 +470,7 @@ class ngls_workspace:
             if outfile != None : plt.savefig(outfile,bbox_inches='tight',pad_inches=0.1)
             if show: plt.show()
         else:
-            print("ERROR: NILC weights not computed. Aborting...")
+            print("ERROR: NGLS weights not computed. Aborting...")
             exit()            
          
 
