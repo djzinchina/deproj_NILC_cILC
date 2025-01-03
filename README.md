@@ -1,6 +1,6 @@
 ## deproj_NILC_cILC
 
-codes for NILC/cILC on deprojected simulations. We aim to implement component separation methods on the input multifrequency maps whose systematics are filtered by deprojection.
+This project include codes for NILC/cILC on deprojected simulations. We aim to implement component separation methods on the input multifrequency maps whose systematics are filtered by deprojection. See [arXiv:2412.20415](https://arxiv.org/abs/2412.20415) for details of the work.
 
 #### Main scripts
 
